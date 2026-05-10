@@ -536,16 +536,16 @@ a { -webkit-tap-highlight-color: transparent; }
 <!-- CATEGORY NAV -->
 <nav class="cat-nav" id="cat-nav">
   <div class="cat-nav-inner">
-    <button class="cat-nav-btn active" onclick="scrollTo('biryani')">🍛 Biryani</button>
-    <button class="cat-nav-btn" onclick="scrollTo('mutton')">🥩 Mutton</button>
-    <button class="cat-nav-btn" onclick="scrollTo('beef')">🍖 Beef</button>
-    <button class="cat-nav-btn" onclick="scrollTo('seafood')">🐟 Sea Food</button>
-    <button class="cat-nav-btn" onclick="scrollTo('poultry')">🍗 Poultry</button>
-    <button class="cat-nav-btn" onclick="scrollTo('tandoor')">🔥 Tandoor</button>
-    <button class="cat-nav-btn" onclick="scrollTo('arabic')">🌙 Arabic</button>
-    <button class="cat-nav-btn" onclick="scrollTo('rice')">🍚 Rice &amp; Noodles</button>
-    <button class="cat-nav-btn" onclick="scrollTo('starters')">🥗 Starters</button>
-    <button class="cat-nav-btn" onclick="scrollTo('breads')">🫓 Breads</button>
+    <button class="cat-nav-btn active" onclick="goToCategory('biryani', this)">🍛 Biryani</button>
+    <button class="cat-nav-btn" onclick="goToCategory('mutton', this)">🥩 Mutton</button>
+    <button class="cat-nav-btn" onclick="goToCategory('beef', this)">🍖 Beef</button>
+    <button class="cat-nav-btn" onclick="goToCategory('seafood', this)">🐟 Sea Food</button>
+    <button class="cat-nav-btn" onclick="goToCategory('poultry', this)">🍗 Poultry</button>
+    <button class="cat-nav-btn" onclick="goToCategory('tandoor', this)">🔥 Tandoor</button>
+    <button class="cat-nav-btn" onclick="goToCategory('arabic', this)">🌙 Arabic</button>
+    <button class="cat-nav-btn" onclick="goToCategory('rice', this)">🍚 Rice &amp; Noodles</button>
+    <button class="cat-nav-btn" onclick="goToCategory('starters', this)">🥗 Starters</button>
+    <button class="cat-nav-btn" onclick="goToCategory('breads', this)">🫓 Breads</button>
   </div>
 </nav>
 
@@ -1593,11 +1593,33 @@ a { -webkit-tap-highlight-color: transparent; }
 </footer>
 
 <script>
-function scrollTo(id) {
+let scrollingFromClick = false;
+
+function goToCategory(id, btn) {
   const el = document.getElementById(id);
-  if (el) el.scrollIntoView({ behavior: 'smooth' });
+  if (!el) return;
+
+  // Mark active immediately on click
   document.querySelectorAll('.cat-nav-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
+  btn.classList.add('active');
+  scrollActiveIntoView(btn);
+
+  // Prevent the scroll observer from overriding the click highlight briefly
+  scrollingFromClick = true;
+  clearTimeout(window._scrollClickTimer);
+  window._scrollClickTimer = setTimeout(() => { scrollingFromClick = false; }, 800);
+
+  el.scrollIntoView({ behavior: 'smooth' });
+}
+
+function scrollActiveIntoView(btn) {
+  const navInner = document.querySelector('.cat-nav-inner');
+  const nav = document.querySelector('.cat-nav');
+  const navRect = nav.getBoundingClientRect();
+  const btnRect = btn.getBoundingClientRect();
+  if (btnRect.left < navRect.left + 20 || btnRect.right > navRect.right - 20) {
+    btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }
 }
 
 // Highlight active category on scroll
@@ -1605,20 +1627,14 @@ const sections = document.querySelectorAll('.menu-category');
 const buttons = document.querySelectorAll('.cat-nav-btn');
 
 const observer = new IntersectionObserver((entries) => {
+  if (scrollingFromClick) return;
   entries.forEach(entry => {
     if (entry.isIntersecting) {
       const id = entry.target.id;
-      buttons.forEach((btn, i) => {
-        const isMatch = btn.getAttribute('onclick') === `scrollTo('${id}')`;
+      buttons.forEach(btn => {
+        const isMatch = btn.getAttribute('onclick') === `goToCategory('${id}', this)`;
         btn.classList.toggle('active', isMatch);
-        if (isMatch) {
-          const nav = document.querySelector('.cat-nav-inner');
-          const navRect = nav.parentElement.getBoundingClientRect();
-          const btnRect = btn.getBoundingClientRect();
-          if (btnRect.left < navRect.left || btnRect.right > navRect.right) {
-            btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-          }
-        }
+        if (isMatch) scrollActiveIntoView(btn);
       });
     }
   });
