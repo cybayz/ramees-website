@@ -120,10 +120,14 @@ a { -webkit-tap-highlight-color: transparent; }
   animation: fadeUp 0.7s 0.2s both;
 }
 .hero-logo {
-  width: clamp(120px, 16vw, 180px);
+  width: clamp(220px, 28vw, 340px);
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  object-position: center 28%;
   margin: 0 auto 28px;
+  border-radius: 16px;
   animation: fadeUp 0.8s 0.3s both;
-  filter: drop-shadow(0 0 30px rgba(201,162,39,0.25));
+  filter: drop-shadow(0 0 40px rgba(201,162,39,0.3));
 }
 .hero-title {
   font-family: 'Cinzel', serif;
@@ -358,6 +362,9 @@ a { -webkit-tap-highlight-color: transparent; }
   width: 100%;
   display: block;
   transition: transform 0.5s;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  object-position: center top;
 }
 .card-image-wrap:hover img { transform: scale(1.03); }
 .since-badge {
@@ -936,7 +943,7 @@ a { -webkit-tap-highlight-color: transparent; }
   .about-section { grid-template-columns: 1fr; gap: 36px; padding: 70px 20px; }
   .since-badge { width: 80px; height: 80px; font-size: 10px; bottom: -14px; right: -10px; }
   .since-badge .year { font-size: 19px; }
-  .card-image-wrap img { max-height: 280px; object-fit: cover; object-position: center; }
+  .card-image-wrap img { max-height: 360px; object-fit: cover; object-position: center top; }
 
   .menu-section { padding: 70px 0; }
   .menu-section .section-head { padding: 0 20px; margin-bottom: 30px; }
